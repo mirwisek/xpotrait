@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 100%;
+            background: #f9f9f9;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        img, video {
+            max-width: 100%;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Video</h1>
+    <form id="videoForm">
+        <label for="source_image">Source Image:</label><br>
+        <input type="file" id="source_image" name="source_image" required><br>
+
+        <label for="driving_video">Driving Video:</label><br>
+        <input type="file" id="driving_video" name="driving_video" required><br>
+
+        <button type="submit">Generate</button>
+    </form>
+    <div id="output"></div>
+
+    <script>
+        document.getElementById("videoForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = "Processing...";
+
+            try {
+                const response = await fetch("http://localhost:8000/generate-video/", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const result = await response.json();
+                if (result.video_url) {
+                    outputDiv.innerHTML = `
+                        <h3>Generated Video:</h3>
+                        <video controls>
+                            <source src="${result.video_url}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    `;
+                } else {
+                    outputDiv.innerHTML = "Failed to generate video.";
+                }
+            } catch (error) {
+                outputDiv.innerHTML = "Error: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
