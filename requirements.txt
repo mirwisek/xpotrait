@@ -69,3 +69,7 @@ thriftpy2
 
 decord
 face-alignment
+
+# Mir Customization
+uvicorn>=0.25.0
+fastapi>=0.108.0
