@@ -1,3 +1,8 @@
+import sys, os
+
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'core'))
+
 from test_xportrait import main
 
 def generate_ai_video(
