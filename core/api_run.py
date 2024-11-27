@@ -1,9 +1,8 @@
-import sys, os
+import sys
 
-sys.path.insert(0, os.path.join(
-    os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'core'))
+sys.path.insert(0, '/workspace/core/')
 
-from core.test_xportrait import main
+from test_xportrait import get_inference
 
 def generate_ai_video(
     # Model parameters
@@ -75,4 +74,4 @@ def generate_ai_video(
     if output_dir is None:
         raise ValueError("output_dir is required")
 
-    return main(args) # Returns output path of the video
+    return get_inference(args) # Returns output path of the video

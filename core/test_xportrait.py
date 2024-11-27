@@ -378,7 +378,7 @@ def visualize_mm(args, name, batch_data, infer_model, nSample, local_image_dir, 
     imageio.mimsave(output_path, output_img[:,:,:512], fps=batch_data['fps'], quality=10, pixelformat='yuv420p', codec='libx264')
     return output_path
 
-def main(args):
+def get_inference(args):
     
     # ******************************
     # initialize training
@@ -504,5 +504,5 @@ if __name__ == "__main__":
                         help='num frames')  
     args = parser.parse_args()
 
-    main(args)
+    get_inference(args)
     
