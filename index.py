@@ -1,4 +1,6 @@
+
 from fastapi import FastAPI, HTTPException, UploadFile, Form
+from dataclasses import dataclass
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -6,6 +8,8 @@ import subprocess
 import os
 import uuid
 from pathlib import Path
+from core.api_run import generate_ai_video
+
 
 app = FastAPI()
 
@@ -25,6 +29,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 OUTPUT_DIR = "outputs"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+@dataclass
+class VideoRequest():
+    source_image: UploadFile
+    driving_video: UploadFile
+
+
 @app.get("/")
 def read_root():
     """Serve the main HTML file."""
@@ -33,8 +43,8 @@ def read_root():
 
 @app.post("/generate-video/")
 async def generate_video(
-    source_image: UploadFile,  # Input source image file
-    driving_video: UploadFile  # Input driving video file
+    source_image: UploadFile, 
+    driving_video: UploadFile
 ):
     """
     Generate a video using the provided source image and driving video.
@@ -53,6 +63,9 @@ async def generate_video(
     # Save uploaded files
     source_image_path = Path(OUTPUT_DIR) / f"source_image_{uuid.uuid4().hex}.png"
     driving_video_path = Path(OUTPUT_DIR) / f"driving_video_{uuid.uuid4().hex}.mp4"
+
+    print(f"Source image path: {source_image.filename}")
+    print(f"Driving video path: {driving_video.filename}")
 
     with open(source_image_path, "wb") as img_file:
         img_file.write(await source_image.read())
@@ -75,19 +88,28 @@ async def generate_video(
         "--ddim_steps", str(ddim_steps),
     ]
 
+
     try:
         # Run the script as a subprocess
-        result = subprocess.run(command, check=True, text=True, capture_output=True)
-        print(result.stdout)
+        # result = subprocess.run(command, check=True, text=True, capture_output=True)
+        # print(result.stdout)
+        output_video_path = generate_ai_video(model_config=model_config, output_dir=str(OUTPUT_DIR), resume_dir=resume_dir, seed=seed, 
+                          uc_scale=uc_scale, source_image=str(source_image_path), driving_video=str(driving_video_path), 
+                          best_frame=best_frame, out_frames=out_frames, num_mix=num_mix, ddim_steps=ddim_steps)
 
         # Ensure the output video exists
-        generated_video_files = list(Path(OUTPUT_DIR).glob("*.mp4"))
-        if not generated_video_files:
+        # generated_video_files = list(Path(OUTPUT_DIR).glob("*.mp4"))
+        # if not generated_video_files:
+        #     raise HTTPException(status_code=500, detail="Failed to generate video.")
+        if output_video_path is None:
             raise HTTPException(status_code=500, detail="Failed to generate video.")
+        else:
+            print('Generated Video')
+            return {"video_url": f"{output_video_path}"}
 
-        print('Generated Video')
-        generated_video_url = str(generated_video_files[-1])  # Get the most recent video
-        return {"video_url": f"/{generated_video_url}"}
+        # print('Generated Video')
+        # generated_video_url = str(generated_video_files[-1])  # Get the most recent video
+        # return {"video_url": f"/{generated_video_url}"}
     except subprocess.CalledProcessError as e:
         raise HTTPException(status_code=500, detail=f"Error: {e.stderr}")
     

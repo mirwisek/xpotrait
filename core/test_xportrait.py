@@ -376,6 +376,7 @@ def visualize_mm(args, name, batch_data, infer_model, nSample, local_image_dir, 
     output_img = output_img.data.cpu().numpy()
     output_img = img_as_ubyte(output_img)
     imageio.mimsave(output_path, output_img[:,:,:512], fps=batch_data['fps'], quality=10, pixelformat='yuv420p', codec='libx264')
+    return output_path
 
 def main(args):
     
@@ -414,8 +415,7 @@ def main(args):
         if args.local_rank == 0:
             load_state_dict(model, args.resume_dir, strict=False)
     else:
-        print('please privide the correct resume_dir!')
-        exit()
+        raise ValueError('Please provide the correct resume_dir path!')
     
     # ******************************
     # create DDP model
@@ -436,6 +436,8 @@ def main(args):
             infer_batch_data['source_name'] = args.source_image
             nSample = infer_batch_data['sources'].shape[0]
             visualize_mm(args, "inference", infer_batch_data, infer_model, nSample=nSample, local_image_dir=args.output_dir, num_mix=args.num_mix)
+
+    return True
 
 
 if __name__ == "__main__":
