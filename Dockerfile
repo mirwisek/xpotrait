@@ -6,10 +6,12 @@ WORKDIR /app
 
 # Install necessary system dependencies
 RUN apt-get update && apt-get install -y \
+    ffmpeg libsm6 libxext6 \
     python3-tk \
     bash \
     curl \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Copy the application code and required files to the container
 COPY . /app
