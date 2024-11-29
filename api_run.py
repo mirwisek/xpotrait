@@ -1,8 +1,4 @@
-import sys
-
-sys.path.insert(0, '/workspace/core/')
-
-from test_xportrait import get_inference
+from core.test_xportrait import get_inference
 
 def generate_ai_video(
     # Model parameters
