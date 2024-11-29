@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Install necessary system dependencies
 RUN apt-get update && apt-get install -y \
-    ffmpeg libsm6 libxext6 \
+    ffmpeg libsm6 libxext6 libfontconfig1 libxrender1 libgl1-mesa-glx \
     python3-tk \
     bash \
     curl \
