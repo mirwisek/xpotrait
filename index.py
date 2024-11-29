@@ -7,7 +7,7 @@ import subprocess
 import os
 import uuid
 from pathlib import Path
-from core.api_run import generate_ai_video
+from api_run import generate_ai_video
 
 
 app = FastAPI()
