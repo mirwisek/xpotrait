@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip install opencv-python-headless
 
 # Copy the application code and required files to the container
 COPY . /app
